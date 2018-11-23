@@ -43,11 +43,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private static String translate(String text) {
-        ITranslator translator = TranslationFactory.newTranslator();
-        return translator.Translate(text, Language.ENGLISH, Language.SPANISH);
-    }
-
     /**
      * Showing google speech input dialog
      * */
@@ -97,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
             ITranslator translator = TranslationFactory.newTranslator();
             String result = "Error processing speech";
             try {
-                translator.Translate(params[0], Language.ENGLISH, Language.SPANISH);
+                translator.translate(params[0], Language.ENGLISH, Language.SPANISH);
             } catch(Exception e) {
                 Log.d(LOG_TAG, e.getMessage());
             }

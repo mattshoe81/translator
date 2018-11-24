@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,24 +23,24 @@ class HttpClient extends HttpClientBase {
     }
 
     public String post(String body) throws IOException {
-        //Create connection
+        //Create this.connection
         this.connection = (HttpURLConnection) this.url.openConnection();
         this.connection.setRequestMethod("POST");
         this.setHeaders();
-        connection.setRequestProperty("Content-Length",
+        this.connection.setRequestProperty("Content-Length",
                 Integer.toString(body.getBytes().length));
 
-        connection.setUseCaches(false);
-        connection.setDoOutput(true);
+        this.connection.setUseCaches(false);
+        this.connection.setDoOutput(true);
 
         //Send request
         DataOutputStream wr = new DataOutputStream (
-                connection.getOutputStream());
+                this.connection.getOutputStream());
         wr.writeBytes(body);
         wr.close();
 
         //Get Response
-        InputStream is = connection.getInputStream();
+        InputStream is = this.connection.getInputStream();
         BufferedReader rd = new BufferedReader(new InputStreamReader(is));
         StringBuilder response = new StringBuilder(); // or StringBuffer if Java version 5+
         String line;
@@ -48,18 +49,19 @@ class HttpClient extends HttpClientBase {
             response.append('\r');
         }
         rd.close();
-        if (connection != null) {
-            connection.disconnect();
+        if (this.connection != null) {
+            this.connection.disconnect();
         }
         return response.toString();
     }
 
-    public String get(Pair<String, String>[] queryParams) throws IOException {
+    public String get(ArrayList<Pair<String, String>> queryParams) throws IOException {
 
         StringBuilder queryString = new StringBuilder("?");
-        for (int i = 0; i < queryParams.length; i++) {
-            queryString.append(queryParams[i].first + "=" + queryParams[i].second);
-            if (i != queryParams.length - 1) queryString.append("&");
+        for (int i = 0; i < queryParams.size(); i++) {
+            Pair<String, String> param = queryParams.get(i);
+            queryString.append(param.first + "=" + param.second);
+            if (i != queryParams.size() - 1) queryString.append("&");
         }
         this.url = new URL(this.url.toString() + queryString.toString());
 
@@ -67,7 +69,7 @@ class HttpClient extends HttpClientBase {
     }
 
     public String get() throws IOException {
-        HttpURLConnection con = (HttpURLConnection) this.url.openConnection();
+        this.connection = (HttpURLConnection) this.url.openConnection();
 
         // optional default is GET
         this.connection.setRequestMethod("GET");
@@ -76,7 +78,7 @@ class HttpClient extends HttpClientBase {
         this.setHeaders();
 
         BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
+                new InputStreamReader(this.connection.getInputStream()));
         String inputLine;
         StringBuffer response = new StringBuffer();
 
@@ -92,7 +94,7 @@ class HttpClient extends HttpClientBase {
     private void setHeaders() {
         Set<Map.Entry<String, String>> entries = this.headers.entrySet();
         for (Map.Entry<String, String> header : entries) {
-            connection.setRequestProperty(header.getKey(), header.getValue());
+            this.connection.setRequestProperty(header.getKey(), header.getValue());
         }
     }
 

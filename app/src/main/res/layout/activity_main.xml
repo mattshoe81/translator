@@ -6,51 +6,112 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" >
-
-        <TextView
-            android:id="@+id/txtSpeechInput"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="100dp"
-            android:textSize="26dp"
-            android:textStyle="normal" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingLeft="5dp"
+        android:paddingTop="8dp"
+        android:paddingRight="5dp"
+        android:paddingBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/toolbar3"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="60dp"
-            android:gravity="center"
-            android:orientation="vertical" >
-
+            android:orientation="vertical">
 
             <TextView
+                android:id="@+id/txtSpeechInput"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="Tap button"
-                android:textSize="15dp"
+                android:textSize="26dp"
                 android:textStyle="normal" />
+
         </LinearLayout>
+    </ScrollView>
 
-        <Button
-            android:id="@+id/btnSpeak"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginEnd="147dp"
-            android:layout_marginBottom="115dp"
-            android:text="Button" />
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="75sp"
+        android:paddingBottom="50dp"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    </RelativeLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btnSpeak"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:clickable="true"
+        app:fabSize="normal"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar3"
+        app:layout_constraintEnd_toEndOf="@+id/toolbar3"
+        app:layout_constraintTop_toTopOf="@+id/toolbar3"
+        app:srcCompat="@drawable/ic_mic" />
+
+    <Spinner
+        android:id="@+id/sourceDropdown"
+        android:layout_width="200sp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/background_light"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        app:layout_constraintStart_toEndOf="@+id/textView"
+        app:layout_constraintTop_toTopOf="@+id/toolbar3" />
+
+    <Spinner
+        android:id="@+id/targetDropdown"
+        android:layout_width="200sp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/background_light"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        app:layout_constraintStart_toStartOf="@+id/sourceDropdown"
+        app:layout_constraintTop_toBottomOf="@+id/sourceDropdown" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:paddingLeft="0dp"
+        android:paddingRight="0dp"
+        android:text="From:"
+        android:textColor="@android:color/background_light"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/sourceDropdown"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/sourceDropdown" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="To:"
+        android:textColor="@android:color/background_light"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/targetDropdown"
+        app:layout_constraintStart_toStartOf="@+id/textView"
+        app:layout_constraintTop_toTopOf="@+id/targetDropdown" />
+
+    <ImageButton
+        android:id="@+id/speakBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:clickable="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_speak" />
 
 </android.support.constraint.ConstraintLayout>

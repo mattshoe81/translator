@@ -1,6 +1,8 @@
 package com.example.matts.translator;
 
 import android.content.Context;
+import android.content.IntentFilter;
+import android.hardware.Camera;
 import android.speech.tts.TextToSpeech;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -25,7 +27,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.PriorityQueue;
+
 import android.os.AsyncTask;
+
+import com.google.android.gms.vision.CameraSource;
+import com.google.android.gms.vision.text.TextRecognizer;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -40,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Language target = Language.ENGLISH;
     private String[] languages;
     private TextToSpeech tts;
+    private CameraSource cameraSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,8 +69,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         speakBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                speak();
-                Toast.makeText(getApplicationContext(), "Speaking the words", Toast.LENGTH_LONG).show();
+//                speak();
+//                Toast.makeText(getApplicationContext(), "Speaking the words", Toast.LENGTH_LONG).show();
             }
         });
         btnSpeak.setOnClickListener(new View.OnClickListener() {
@@ -100,6 +108,41 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         );
     }
 
+    private void createCameraSource(boolean autoFocus, boolean useFlash) {
+        Context context = getApplicationContext();
+
+        // TODO: Create the TextRecognizer
+        TextRecognizer textRecognizer = new TextRecognizer.Builder(context).build();
+        // TODO: Set the TextRecognizer's Processor.
+
+        // TODO: Check if the TextRecognizer is operational.
+        if (!textRecognizer.isOperational()) {
+            Log.w(LOG_TAG, "Detector dependencies are not yet available.");
+
+            // Check for low storage.  If there is low storage, the native library will not be
+            // downloaded, so detection will not become operational.
+            IntentFilter lowStorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
+            boolean hasLowStorage = registerReceiver(null, lowStorageFilter) != null;
+
+            if (hasLowStorage) {
+                String lowStorageError = "Your device does not have enough storage";
+                Toast.makeText(this, lowStorageError, Toast.LENGTH_LONG).show();
+                Log.w(LOG_TAG, lowStorageError);
+            }
+        }
+
+        // TODO: Create the cameraSource using the TextRecognizer.
+        cameraSource =
+                new CameraSource.Builder(getApplicationContext(), textRecognizer)
+                        .setFacing(CameraSource.CAMERA_FACING_BACK)
+                        .setRequestedPreviewSize(1280, 1024)
+                        .setRequestedFps(15.0f)
+                        .setAutoFocusEnabled(autoFocus)
+                        //.setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
+                       // .setFocusMode(autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO : null)
+                        .build();
+    }
+
     //Performing action onItemSelected and onNothing selected
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position,long id) {
@@ -121,15 +164,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void initializeDropdowns() {
         languages = new String[Language.values().length];
         int index = 0;
+        // Sort languages alphabetically
+        PriorityQueue<String> sortedLanguages = new PriorityQueue<>();
         for (Language language : Language.values()) {
-            languages[index] = language.name();
+            sortedLanguages.add(language.name());
             Log.d(LOG_TAG, language.name());
+        }
+        // Put them all into the languages list.
+        while (!sortedLanguages.isEmpty()) {
+            languages[index] = sortedLanguages.remove();
             index++;
         }
         ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, languages);
 
         sourceDropdown.setAdapter(aa);
         targetDropdown.setAdapter(aa);
+
+        sourceDropdown.setSelection(20, true);
     }
 
 
@@ -141,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                         RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, source.toString());
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
                         "Speak Now");
         try {
